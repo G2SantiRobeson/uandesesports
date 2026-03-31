@@ -1,0 +1,346 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(7, 11, 16, 0.58);
+  backdrop-filter: blur(16px);
+}
+
+.panel {
+  width: min(1420px, calc(100vw - 1.25rem));
+  height: calc(100% - 2rem);
+  margin: 1rem 1rem 1rem auto;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(137, 174, 190, 0.12), transparent 24%),
+    var(--surface-3);
+  box-shadow: 0 34px 90px rgba(3, 9, 15, 0.34);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.45rem 1.6rem 1.2rem;
+  border-bottom: 1px solid var(--line-soft);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent),
+    rgba(16, 23, 33, 0.82);
+}
+
+.panelHeaderCopy {
+  display: grid;
+  gap: 0.45rem;
+  max-width: 620px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--soft);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-family: var(--heading-font);
+  font-size: 2.2rem;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.panelDescription {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.userBadge,
+.closeButton {
+  min-height: 2.75rem;
+  padding: 0.78rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.closeButton {
+  cursor: pointer;
+}
+
+.panelBody {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.loginShell {
+  height: 100%;
+  overflow: auto;
+  padding: 1.5rem;
+}
+
+.workspace {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 390px minmax(0, 1fr);
+}
+
+.sidebar {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-right: 1px solid var(--line-soft);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent),
+    rgba(12, 18, 26, 0.7);
+}
+
+.editor {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 1.25rem;
+  padding: 1.25rem 1.45rem 1.6rem;
+}
+
+.sectionCard {
+  display: grid;
+  gap: 1.1rem;
+  padding: 1.25rem 1.35rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 48%),
+    var(--surface-2);
+  box-shadow: var(--shadow-soft);
+}
+
+.sidebarCard {
+  padding: 1.15rem 1.15rem 1.2rem;
+}
+
+.primarySection {
+  border-color: rgba(137, 174, 190, 0.14);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.sectionHeader h3,
+.selectedPageHeader h3 {
+  margin: 0;
+  font-family: var(--heading-font);
+  font-size: 1.3rem;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+}
+
+.sectionHeader p,
+.selectedPageHeader p,
+.emptyCopy {
+  margin: 0.35rem 0 0;
+  color: var(--soft);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.sectionEyebrow {
+  margin: 0 0 0.3rem;
+  color: var(--soft);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+}
+
+.selectedPageHeader {
+  display: grid;
+  gap: 0.2rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.primaryActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.primaryActions select {
+  min-width: 190px;
+}
+
+.createStack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.createComposer {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.createLabel {
+  color: var(--soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.createRow {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.createAction {
+  width: 100%;
+}
+
+.pageList,
+.blocksStack,
+.controlStack {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.controlStack > * {
+  width: 100%;
+}
+
+.pageButton {
+  text-align: left;
+  display: grid;
+  gap: 0.32rem;
+  padding: 1rem 1.05rem;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.pageButton strong {
+  font-size: 1rem;
+  line-height: 1.15;
+}
+
+.pageButton span {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.pageButton small {
+  color: var(--soft);
+  font-size: 0.82rem;
+}
+
+.pageButtonActive {
+  border-color: rgba(137, 174, 190, 0.2);
+  background:
+    linear-gradient(180deg, rgba(137, 174, 190, 0.12), rgba(137, 174, 190, 0.05)),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 0 1px rgba(137, 174, 190, 0.08);
+}
+
+.blockCard {
+  padding: 1rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.settingsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 1100px) {
+  .panel {
+    width: calc(100vw - 1rem);
+    height: calc(100% - 1rem);
+    margin: 0.5rem 0.5rem 0.5rem auto;
+  }
+
+  .workspace {
+    grid-template-columns: 340px minmax(0, 1fr);
+  }
+
+  .settingsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+}
+
+@media (max-width: 720px) {
+  .panel {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .panelHeader {
+    padding: 1.2rem 1rem 1rem;
+  }
+
+  .panelHeader h2 {
+    font-size: 1.8rem;
+  }
+
+  .headerActions,
+  .sectionHeader,
+  .primaryActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sidebar,
+  .editor,
+  .loginShell {
+    padding: 1rem;
+  }
+
+  .createRow {
+    grid-template-columns: 1fr;
+  }
+}

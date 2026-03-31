@@ -1,0 +1,22 @@
+.media {
+  display: grid;
+  gap: 0.75rem;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.media img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.media figcaption {
+  padding: 0 1.15rem 1.15rem;
+  color: var(--soft);
+  font-size: 0.9rem;
+}

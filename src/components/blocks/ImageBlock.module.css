@@ -1,0 +1,31 @@
+.layout {
+  display: grid;
+}
+
+.reverse {
+  direction: rtl;
+}
+
+.reverse > * {
+  direction: ltr;
+}
+
+.imageFrame {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-soft);
+}
+
+.imageFrame img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.imageFrame p {
+  padding: 1rem 1.15rem;
+  color: var(--soft);
+  line-height: 1.7;
+}

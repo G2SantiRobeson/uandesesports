@@ -1,0 +1,47 @@
+.media {
+  display: grid;
+  gap: 0.75rem;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.media img {
+  width: 100%;
+  max-height: 460px;
+  object-fit: cover;
+}
+
+.media figcaption {
+  padding: 0 1.2rem 1.2rem;
+  color: var(--soft);
+  font-size: 0.9rem;
+}
+
+.highlightBox {
+  display: grid;
+  gap: 0.45rem;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1.2rem;
+  border: 1px solid rgba(137, 174, 190, 0.16);
+  border-radius: var(--radius-md);
+  background: rgba(137, 174, 190, 0.06);
+}
+
+.highlightBox span {
+  color: var(--soft);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.highlightBox strong {
+  font-family: var(--heading-font);
+  font-size: 1.15rem;
+  line-height: 1.4;
+}

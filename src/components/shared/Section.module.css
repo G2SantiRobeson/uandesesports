@@ -1,0 +1,28 @@
+.section {
+  padding: 6rem 1.5rem;
+  scroll-margin-top: 5.75rem;
+}
+
+.muted {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 100%),
+    linear-gradient(180deg, rgba(16, 23, 33, 0.66) 0%, rgba(11, 18, 26, 0.24) 100%);
+}
+
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  gap: 2.25rem;
+}
+
+.content {
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (max-width: 720px) {
+  .section {
+    padding: 5rem 1rem;
+  }
+}
