@@ -88,6 +88,30 @@
 
 .closeButton {
   cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    transform var(--transition);
+}
+
+.closeButton:hover,
+.closeButton:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+.closeButtonDanger {
+  border-color: rgba(211, 167, 167, 0.22);
+  background: rgba(211, 167, 167, 0.08);
+  color: var(--danger);
+}
+
+.closeButtonDanger:hover,
+.closeButtonDanger:focus-visible {
+  background: rgba(211, 167, 167, 0.14);
+  border-color: rgba(211, 167, 167, 0.3);
 }
 
 .panelBody {
@@ -99,10 +123,12 @@
   height: 100%;
   overflow: auto;
   padding: 1.5rem;
+  display: grid;
+  place-items: center;
 }
 
 .accountShell {
-  max-width: 720px;
+  width: min(760px, 100%);
 }
 
 .accountMeta {

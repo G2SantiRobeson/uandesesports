@@ -3,6 +3,12 @@
   gap: 1rem;
 }
 
+.authShell {
+  width: min(720px, 100%);
+  display: grid;
+  gap: 1rem;
+}
+
 .section {
   display: grid;
   gap: 0.95rem;
@@ -14,6 +20,19 @@
     rgba(255, 255, 255, 0.018);
 }
 
+.authIntroCard,
+.authFormCard {
+  display: grid;
+  gap: 1rem;
+  padding: 1.3rem 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+    rgba(30, 39, 52, 0.8);
+  box-shadow: 0 18px 36px rgba(3, 9, 15, 0.18);
+}
+
 .authHeader {
   display: flex;
   align-items: flex-start;
@@ -21,28 +40,69 @@
   gap: 1rem;
 }
 
+.authTopbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.authIntroCopy {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.authTitle {
+  margin: 0;
+  font-family: var(--heading-font);
+  font-size: clamp(1.55rem, 1.2rem + 1vw, 2.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  color: var(--text);
+}
+
+.authSubtitle {
+  margin: 0;
+  max-width: 54ch;
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 0.98rem;
+}
+
 .tabRow {
   display: inline-flex;
   padding: 0.3rem;
-  border: 1px solid var(--line-soft);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(14, 20, 30, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .tabButton {
   min-height: 2.45rem;
-  padding: 0.6rem 0.9rem;
+  padding: 0.62rem 1rem;
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: var(--soft);
+  color: var(--muted);
   cursor: pointer;
   font-weight: 700;
+  transition:
+    background var(--transition),
+    color var(--transition),
+    transform var(--transition);
+}
+
+.tabButton:hover,
+.tabButton:focus-visible {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .tabButtonActive {
-  background: rgba(137, 174, 190, 0.12);
+  background: rgba(137, 174, 190, 0.18);
   color: var(--text);
+  box-shadow: 0 10px 24px rgba(6, 16, 24, 0.18);
 }
 
 .blockShell {
@@ -112,14 +172,14 @@
 
 .fieldGroup {
   display: grid;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .fieldGroup label,
 .checkboxLabel {
-  color: var(--soft);
-  font-size: 0.8rem;
-  font-weight: 600;
+  color: #d7e0ea;
+  font-size: 0.82rem;
+  font-weight: 700;
   letter-spacing: 0.01em;
 }
 
@@ -127,16 +187,43 @@
 .textarea,
 .select {
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
-  background: rgba(8, 12, 18, 0.74);
+  background: rgba(8, 13, 20, 0.92);
   color: var(--text);
-  padding: 0.9rem 1rem;
+  padding: 0.98rem 1rem;
+  transition:
+    border-color var(--transition),
+    background var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.input:hover,
+.textarea:hover,
+.select:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(10, 16, 24, 0.98);
+}
+
+.input:focus-visible,
+.textarea:focus-visible,
+.select:focus-visible {
+  outline: none;
+  border-color: rgba(173, 208, 223, 0.66);
+  box-shadow:
+    0 0 0 1px rgba(173, 208, 223, 0.2),
+    0 0 0 5px rgba(173, 208, 223, 0.12);
+}
+
+.inputError {
+  border-color: rgba(220, 129, 129, 0.6);
+  box-shadow: 0 0 0 1px rgba(220, 129, 129, 0.16);
 }
 
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--soft);
+  color: #8f9cad;
 }
 
 .textarea {
@@ -174,6 +261,29 @@
   gap: 0.65rem;
 }
 
+.authFieldStack {
+  display: grid;
+  gap: 1rem;
+}
+
+.authActions {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+}
+
+.fieldHint {
+  color: var(--soft);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.fieldError {
+  color: #ffb0b0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
 .button,
 .secondaryButton,
 .dangerButton,
@@ -182,6 +292,23 @@
   border-radius: 999px;
   padding: 0.78rem 1rem;
   cursor: pointer;
+  transition:
+    transform var(--transition),
+    background var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition),
+    color var(--transition),
+    opacity var(--transition);
+}
+
+.button:disabled,
+.secondaryButton:disabled,
+.dangerButton:disabled,
+.ghostButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+  box-shadow: none;
 }
 
 .button {
@@ -189,7 +316,13 @@
   color: #061018;
   font-weight: 700;
   background: linear-gradient(135deg, var(--accent-strong), var(--accent));
-  box-shadow: 0 10px 24px rgba(137, 174, 190, 0.18);
+  box-shadow: 0 14px 30px rgba(137, 174, 190, 0.24);
+}
+
+.button:hover,
+.button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 34px rgba(137, 174, 190, 0.28);
 }
 
 .secondaryButton {
@@ -198,16 +331,36 @@
   color: var(--text);
 }
 
+.secondaryButton:hover,
+.secondaryButton:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.07);
+}
+
 .ghostButton {
   border: 1px dashed rgba(255, 255, 255, 0.12);
   background: transparent;
   color: var(--muted);
 }
 
+.ghostButton:hover,
+.ghostButton:focus-visible {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text);
+}
+
 .dangerButton {
-  border: 1px solid rgba(211, 167, 167, 0.18);
-  background: rgba(211, 167, 167, 0.06);
-  color: var(--danger);
+  border: 1px solid rgba(211, 96, 96, 0.28);
+  background: rgba(211, 96, 96, 0.12);
+  color: #ffc4c4;
+}
+
+.dangerButton:hover,
+.dangerButton:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(211, 96, 96, 0.42);
+  background: rgba(211, 96, 96, 0.18);
 }
 
 .itemCard {
@@ -228,11 +381,11 @@
 
 .helperCard {
   display: grid;
-  gap: 0.32rem;
-  padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.025);
+  gap: 0.4rem;
+  padding: 1.05rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .helperLabel {
@@ -330,12 +483,32 @@
   font-size: 0.94rem;
 }
 
+.errorBanner,
+.successBanner {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+}
+
 .error {
   padding: 0.9rem 1rem;
   border: 1px solid rgba(211, 167, 167, 0.18);
   border-radius: 16px;
   background: rgba(211, 167, 167, 0.08);
   color: var(--danger);
+}
+
+.errorBanner {
+  border: 1px solid rgba(211, 96, 96, 0.26);
+  background: rgba(211, 96, 96, 0.11);
+  color: #ffd2d2;
+}
+
+.successBanner {
+  border: 1px solid rgba(129, 195, 156, 0.28);
+  background: rgba(129, 195, 156, 0.1);
+  color: #d9ffde;
 }
 
 .credentials {
@@ -348,8 +521,66 @@
   border-top: 1px solid var(--line-soft);
 }
 
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(5, 10, 16, 0.72);
+  backdrop-filter: blur(14px);
+}
+
+.confirmModal {
+  width: min(460px, 100%);
+  display: grid;
+  gap: 1rem;
+  padding: 1.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent),
+    rgba(25, 34, 47, 0.96);
+  box-shadow: 0 22px 48px rgba(3, 9, 15, 0.34);
+}
+
+.modalHeader {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.modalHeader h4 {
+  margin: 0;
+  font-family: var(--heading-font);
+  font-size: 1.3rem;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+}
+
+.modalReview {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.modalReview > div {
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(9, 14, 22, 0.78);
+}
+
+.modalActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
 @media (max-width: 720px) {
-  .authHeader {
+  .authHeader,
+  .authTopbar {
     flex-direction: column;
   }
 
@@ -358,7 +589,8 @@
   }
 
   .tripleRow,
-  .moduleGrid {
+  .moduleGrid,
+  .modalActions {
     grid-template-columns: 1fr;
   }
 

@@ -167,6 +167,19 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
     return `${page.blocks.length} bloques - menu: ${menuStatus}`;
   }
 
+  const isAccessMode = !isAdmin;
+  const headerEyebrow = isAccessMode ? 'Acceso de usuarios' : 'Panel Admin';
+  const headerTitle = isAccessMode
+    ? session
+      ? 'Tu cuenta UANDES Esports'
+      : 'Ingresa o crea tu cuenta'
+    : 'Gestion visual del sitio';
+  const headerDescription = isAccessMode
+    ? session
+      ? 'Tu sesion esta activa. Puedes cerrar el panel o salir de tu cuenta cuando quieras.'
+      : 'Accede con tu nick gamer o registrate para usar una cuenta real dentro de la plataforma.'
+    : 'Administra navegacion, paginas, bloques, torneos y contenido editable sin tocar el codigo fuente.';
+
   if (!isOpen) {
     return null;
   }
@@ -177,17 +190,14 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
         className={styles.panel}
         role="dialog"
         aria-modal="true"
-        aria-label="Panel de administracion"
+        aria-label={isAccessMode ? 'Acceso de usuarios' : 'Panel de administracion'}
         onClick={(event) => event.stopPropagation()}
       >
         <div className={styles.panelHeader}>
           <div className={styles.panelHeaderCopy}>
-            <p className={styles.eyebrow}>Panel Admin</p>
-            <h2>Gestion visual del sitio</h2>
-            <p className={styles.panelDescription}>
-              Administra navegacion, paginas, bloques, torneos y contenido
-              editable sin tocar el codigo fuente.
-            </p>
+            <p className={styles.eyebrow}>{headerEyebrow}</p>
+            <h2>{headerTitle}</h2>
+            <p className={styles.panelDescription}>{headerDescription}</p>
           </div>
 
           <div className={styles.headerActions}>
@@ -201,7 +211,9 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
             ) : null}
             <button
               type="button"
-              className={styles.closeButton}
+              className={`${styles.closeButton} ${
+                isAccessMode ? styles.closeButtonDanger : ''
+              }`}
               onClick={onClose}
             >
               Cerrar
@@ -262,7 +274,7 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
                   </div>
                 </section>
               ) : (
-                <LoginForm />
+                <LoginForm onSuccess={onClose} />
               )}
             </div>
           </div>

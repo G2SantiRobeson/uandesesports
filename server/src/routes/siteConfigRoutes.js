@@ -5,7 +5,15 @@ import {
 } from '../repositories/siteConfigRepository.js';
 
 function requireAdmin(request, reply) {
-  if (request.sessionUser?.role !== 'admin') {
+  if (!request.sessionUser) {
+    reply.code(401).send({
+      error:
+        'Tu sesion no fue reconocida por la API. Inicia sesion nuevamente y vuelve a intentar.',
+    });
+    return false;
+  }
+
+  if (String(request.sessionUser.role || '').toLowerCase() !== 'admin') {
     reply.code(403).send({
       error: 'No tienes permisos para editar la configuracion del sitio.',
     });

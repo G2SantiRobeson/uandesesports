@@ -1,4 +1,5 @@
 import { API_CONFIG, buildApiUrl } from '../config/api';
+import { loadSessionToken } from './sessionTokenService';
 
 function parseResponseBody(text) {
   if (!text) {
@@ -14,6 +15,7 @@ function parseResponseBody(text) {
 
 export async function apiRequest(pathname, options = {}) {
   const controller = new AbortController();
+  const sessionToken = loadSessionToken();
   const timeoutId = window.setTimeout(
     () => controller.abort(),
     options.timeoutMs || API_CONFIG.timeoutMs,
@@ -25,6 +27,7 @@ export async function apiRequest(pathname, options = {}) {
       credentials: 'include',
       headers: {
         Accept: 'application/json',
+        ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
         ...(options.body ? { 'Content-Type': 'application/json' } : {}),
         ...(options.headers || {}),
       },

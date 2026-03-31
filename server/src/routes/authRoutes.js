@@ -62,6 +62,7 @@ export default async function authRoutes(app) {
     setSessionCookie(reply, token);
 
     return {
+      token,
       session: sanitizeUser(user),
     };
   });
@@ -99,6 +100,7 @@ export default async function authRoutes(app) {
     setSessionCookie(reply, token);
 
     return reply.code(201).send({
+      token,
       session: sanitizeUser(user),
     });
   });

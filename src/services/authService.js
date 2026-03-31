@@ -1,9 +1,18 @@
 import { API_CONFIG } from '../config/api';
 import { apiRequest } from './httpClient';
+import {
+  clearSessionToken,
+  saveSessionToken,
+} from './sessionTokenService';
 
 export async function loadSession() {
   const response = await apiRequest(API_CONFIG.endpoints.auth.session);
-  return response.session || null;
+  const session = response.session || null;
+
+  if (!session) {
+    clearSessionToken();
+  }
+  return session;
 }
 
 export async function loginWithCredentials(identifier, password) {
@@ -15,6 +24,10 @@ export async function loginWithCredentials(identifier, password) {
         password,
       },
     });
+
+    if (response.token) {
+      saveSessionToken(response.token);
+    }
 
     return {
       success: true,
@@ -35,6 +48,10 @@ export async function registerWithCredentials(payload) {
       body: payload,
     });
 
+    if (response.token) {
+      saveSessionToken(response.token);
+    }
+
     return {
       success: true,
       session: response.session,
@@ -48,7 +65,11 @@ export async function registerWithCredentials(payload) {
 }
 
 export async function clearSession() {
-  await apiRequest(API_CONFIG.endpoints.auth.logout, {
-    method: 'POST',
-  });
+  try {
+    await apiRequest(API_CONFIG.endpoints.auth.logout, {
+      method: 'POST',
+    });
+  } finally {
+    clearSessionToken();
+  }
 }
