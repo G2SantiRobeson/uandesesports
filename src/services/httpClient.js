@@ -13,7 +13,13 @@ function parseResponseBody(text) {
   }
 }
 
-export async function apiRequest(pathname, options = {}) {
+function delay(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+async function runRequest(pathname, options = {}) {
   const controller = new AbortController();
   const sessionToken = loadSessionToken();
   const timeoutId = window.setTimeout(
@@ -51,5 +57,27 @@ export async function apiRequest(pathname, options = {}) {
     throw error;
   } finally {
     window.clearTimeout(timeoutId);
+  }
+}
+
+export async function apiRequest(pathname, options = {}) {
+  try {
+    return await runRequest(pathname, options);
+  } catch (error) {
+    const method = String(options.method || 'GET').toUpperCase();
+    const shouldRetry =
+      error.message === 'La solicitud tardo demasiado y fue cancelada.' &&
+      method === 'GET' &&
+      !options.disableRetry;
+
+    if (!shouldRetry) {
+      throw error;
+    }
+
+    await delay(1500);
+    return runRequest(pathname, {
+      ...options,
+      disableRetry: true,
+    });
   }
 }

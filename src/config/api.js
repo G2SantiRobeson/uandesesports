@@ -2,7 +2,7 @@ const fallbackBaseUrl = '/api';
 
 export const API_CONFIG = {
   baseUrl: import.meta.env.VITE_API_BASE_URL || fallbackBaseUrl,
-  timeoutMs: 8000,
+  timeoutMs: 25000,
   endpoints: {
     siteConfig: '/site-config',
     auth: {
