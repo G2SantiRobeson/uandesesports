@@ -7,13 +7,14 @@ function getBearerToken(authorizationHeader) {
     return '';
   }
 
-  const [scheme, token] = authorizationHeader.split(' ');
+  const normalizedHeader = authorizationHeader.trim();
+  const tokenMatch = normalizedHeader.match(/^Bearer\s+(.+)$/i);
 
-  if (!/^bearer$/i.test(String(scheme || '')) || !token) {
+  if (!tokenMatch?.[1]) {
     return '';
   }
 
-  return token.trim();
+  return tokenMatch[1].trim();
 }
 
 function getBodyToken(requestBody) {
