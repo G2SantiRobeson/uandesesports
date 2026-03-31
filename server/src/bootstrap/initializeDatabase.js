@@ -33,13 +33,6 @@ export async function initializeDatabase() {
       );
     `);
 
-    await client.query(
-      `delete from app_users
-       where username = 'admin'
-         and email = 'admin@uandes.cl'
-         and role = 'admin'`,
-    );
-
     const seededConfig = normalizeSiteConfig(cloneData(defaultSiteConfig));
 
     await client.query(

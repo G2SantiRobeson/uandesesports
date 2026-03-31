@@ -31,6 +31,7 @@ function getBodyToken(requestBody) {
 
 export default async function sessionAuthPlugin(app) {
   app.decorateRequest('sessionUser', null);
+  app.decorateRequest('authFailureReason', '');
 
   app.addHook('preHandler', async (request) => {
     const token =
@@ -40,15 +41,38 @@ export default async function sessionAuthPlugin(app) {
 
     if (!token) {
       request.sessionUser = null;
+      request.authFailureReason = 'missing_token';
       return;
     }
 
     try {
       const payload = verifySessionToken(token);
-      const user = await findUserById(payload.sub);
-      request.sessionUser = user || null;
+      try {
+        const user = await findUserById(payload.sub);
+        request.sessionUser = user || null;
+        request.authFailureReason = user ? '' : 'user_not_found';
+
+        if (!user) {
+          app.log.warn(
+            { userId: payload.sub, url: request.url },
+            'Sesion invalida: no se encontro el usuario asociado al token.',
+          );
+        }
+      } catch (error) {
+        request.sessionUser = null;
+        request.authFailureReason = 'session_lookup_failed';
+        app.log.error(
+          { error, url: request.url },
+          'Error buscando el usuario asociado a la sesion.',
+        );
+      }
     } catch (error) {
       request.sessionUser = null;
+      request.authFailureReason = 'invalid_token';
+      app.log.warn(
+        { error: error.message, url: request.url },
+        'Sesion invalida: no fue posible verificar el token.',
+      );
     }
   });
 }
