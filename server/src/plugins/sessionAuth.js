@@ -16,13 +16,27 @@ function getBearerToken(authorizationHeader) {
   return token.trim();
 }
 
+function getBodyToken(requestBody) {
+  if (!requestBody || typeof requestBody !== 'object') {
+    return '';
+  }
+
+  const bodyToken =
+    requestBody.sessionToken ||
+    requestBody.authToken ||
+    requestBody.token;
+
+  return typeof bodyToken === 'string' ? bodyToken.trim() : '';
+}
+
 export default async function sessionAuthPlugin(app) {
   app.decorateRequest('sessionUser', null);
 
   app.addHook('preHandler', async (request) => {
     const token =
       request.cookies?.[env.sessionCookieName] ||
-      getBearerToken(request.headers.authorization);
+      getBearerToken(request.headers.authorization) ||
+      getBodyToken(request.body);
 
     if (!token) {
       request.sessionUser = null;
