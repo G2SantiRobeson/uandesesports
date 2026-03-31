@@ -9,6 +9,10 @@ export async function loadSession() {
   const response = await apiRequest(API_CONFIG.endpoints.auth.session);
   const session = response.session || null;
 
+  if (response.token) {
+    saveSessionToken(response.token);
+  }
+
   if (!session) {
     clearSessionToken();
   }

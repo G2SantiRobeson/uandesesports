@@ -28,9 +28,23 @@ function validateRegistrationPayload(body = {}) {
 }
 
 export default async function authRoutes(app) {
-  app.get('/auth/session', async (request) => ({
-    session: sanitizeUser(request.sessionUser),
-  }));
+  app.get('/auth/session', async (request, reply) => {
+    const session = sanitizeUser(request.sessionUser);
+
+    if (!request.sessionUser) {
+      return {
+        session: null,
+      };
+    }
+
+    const token = createSessionToken(request.sessionUser);
+    setSessionCookie(reply, token);
+
+    return {
+      token,
+      session,
+    };
+  });
 
   app.post('/auth/login', async (request, reply) => {
     const identifier = String(request.body?.identifier || '').trim();
