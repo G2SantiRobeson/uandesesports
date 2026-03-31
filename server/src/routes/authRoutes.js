@@ -12,13 +12,12 @@ import {
 import { hashPassword } from '../lib/security.js';
 
 function validateRegistrationPayload(body = {}) {
-  const displayName = String(body.displayName || '').trim();
   const username = String(body.username || '').trim();
   const email = String(body.email || '').trim();
   const password = String(body.password || '');
 
-  if (!displayName || !username || !email || !password) {
-    return 'Completa nombre, usuario, email y password.';
+  if (!username || !email || !password) {
+    return 'Completa nick gamer, email y password.';
   }
 
   if (password.length < 8) {
@@ -74,7 +73,6 @@ export default async function authRoutes(app) {
       return reply.code(400).send({ error: validationError });
     }
 
-    const displayName = String(request.body.displayName).trim();
     const username = String(request.body.username).trim();
     const email = String(request.body.email).trim();
     const password = String(request.body.password);
@@ -91,7 +89,6 @@ export default async function authRoutes(app) {
 
     const passwordHash = await hashPassword(password);
     const user = await createUser({
-      displayName,
       username,
       email,
       passwordHash,

@@ -29,11 +29,11 @@ export async function findUserByIdentifier(identifier) {
 export async function createUser({
   username,
   email,
-  displayName,
   passwordHash,
   role = 'user',
 }) {
-  const normalizedUsername = normalizeIdentity(username);
+  const rawUsername = String(username || '').trim();
+  const normalizedUsername = normalizeIdentity(rawUsername);
   const normalizedEmail = normalizeIdentity(email);
 
   const result = await query(
@@ -50,7 +50,7 @@ export async function createUser({
       randomUUID(),
       normalizedUsername,
       normalizedEmail,
-      String(displayName || '').trim(),
+      rawUsername,
       passwordHash,
       role,
     ],

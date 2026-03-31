@@ -39,10 +39,6 @@ export const env = {
     process.env.COOKIE_SECURE,
     process.env.NODE_ENV === 'production',
   ),
-  adminUsername: process.env.ADMIN_USERNAME || 'admin',
-  adminPassword: process.env.ADMIN_PASSWORD || 'uandes2026',
-  adminName: process.env.ADMIN_NAME || 'Admin UANDES',
-  adminEmail: process.env.ADMIN_EMAIL || 'admin@uandes.cl',
 };
 
 if (!env.databaseUrl) {

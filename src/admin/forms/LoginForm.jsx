@@ -5,7 +5,6 @@ import styles from './AdminForms.module.css';
 const initialFormState = {
   identifier: '',
   password: '',
-  displayName: '',
   username: '',
   email: '',
 };
@@ -34,7 +33,6 @@ function LoginForm() {
         mode === 'login'
           ? await login(formValues.identifier, formValues.password)
           : await register({
-              displayName: formValues.displayName,
               username: formValues.username,
               email: formValues.email,
               password: formValues.password,
@@ -90,33 +88,18 @@ function LoginForm() {
       <div className={styles.section}>
         {mode === 'register' ? (
           <>
-            <div className={styles.row}>
+            <div className={styles.tripleRow}>
               <div className={styles.fieldGroup}>
-                <label htmlFor="register-display-name">Nombre visible</label>
-                <input
-                  id="register-display-name"
-                  className={styles.input}
-                  value={formValues.displayName}
-                  onChange={(event) =>
-                    updateField('displayName', event.target.value)
-                  }
-                  placeholder="Ej: Catalina Mena"
-                />
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label htmlFor="register-username">Usuario</label>
+                <label htmlFor="register-username">Nick gamer</label>
                 <input
                   id="register-username"
                   className={styles.input}
                   value={formValues.username}
                   onChange={(event) => updateField('username', event.target.value)}
-                  placeholder="Ej: catalina.mena"
+                  placeholder="Ej: Capywara, Kuro, Nexo"
                 />
               </div>
-            </div>
 
-            <div className={styles.row}>
               <div className={styles.fieldGroup}>
                 <label htmlFor="register-email">Email</label>
                 <input
@@ -145,13 +128,13 @@ function LoginForm() {
         ) : (
           <div className={styles.row}>
             <div className={styles.fieldGroup}>
-              <label htmlFor="login-identifier">Usuario o email</label>
+              <label htmlFor="login-identifier">Nick gamer o email</label>
               <input
                 id="login-identifier"
                 className={styles.input}
                 value={formValues.identifier}
                 onChange={(event) => updateField('identifier', event.target.value)}
-                placeholder="admin o tu@correo.cl"
+                placeholder="Tu nick gamer o tu correo"
               />
             </div>
 
@@ -179,10 +162,10 @@ function LoginForm() {
       </div>
 
       <div className={styles.helperCard}>
-        <span className={styles.helperLabel}>Admin inicial</span>
+        <span className={styles.helperLabel}>Roles</span>
         <p className={styles.helperText}>
-          Si mantienes la semilla por defecto del backend, la cuenta admin inicial
-          es `admin / uandes2026`.
+          Las cuentas nuevas se crean como usuario comun. El rol admin se asigna
+          aparte desde la base de datos.
         </p>
       </div>
     </form>

@@ -22,7 +22,6 @@ export function createSessionToken(user) {
       sub: user.id,
       username: user.username,
       role: user.role,
-      displayName: user.display_name,
     },
     env.jwtSecret,
     {

@@ -1,56 +1,41 @@
 # UANDES Esports
 
-Plataforma institucional de UANDES Esports con frontend en `Vite + React`, API liviana en `Fastify` y persistencia real en `PostgreSQL`.
+Plataforma institucional de UANDES Esports con frontend en `Vite + React`, API en `Fastify` y persistencia real en `PostgreSQL`.
 
-## Arquitectura actual
+## Arquitectura
 
-La UI pública sigue siendo `config-driven`: navbar, páginas, bloques normales y páginas de torneo se siguen renderizando desde un `siteConfig`.
+La UI publica sigue siendo `config-driven`: navbar, paginas, bloques normales y paginas de torneo se renderizan desde un `siteConfig`.
 
-La diferencia es que ahora ese `siteConfig` ya no se guarda en `localStorage`, sino en una base de datos real a través de una API.
+Ahora ese `siteConfig` ya no se guarda en `localStorage`. Se lee y escribe en una API conectada a PostgreSQL.
 
 ```text
 frontend (Vite + React)
 |-- UI publica
 |-- panel admin
-|-- auth UI
+|-- login / registro
 `-- consumo de /api
 
 backend (Fastify)
 |-- auth por cookie + JWT
 |-- permisos por rol
 |-- lectura/escritura de siteConfig
-`-- bootstrap automatico de tablas y admin inicial
+`-- bootstrap automatico de tablas
 
 database (PostgreSQL)
 |-- app_users
 `-- site_configs
 ```
 
-## Qué se mantiene
+## Lo que se mantiene
 
-Se conserva la funcionalidad que ya tenía el sitio:
-
-- páginas y navegación dinámicas
+- paginas y navegacion dinamicas
 - bloques editables por tipo
-- páginas de torneo
+- paginas de torneo
 - fase de grupos con standings
 - playoffs por rondas
-- límites por ronda en cruces
-- imágenes por URL en bloques y torneos
+- limites por ronda en cruces
+- imagenes por URL en bloques y torneos
 - panel admin visual
-
-## Estructura
-
-```text
-.
-|-- src/                # frontend Vite + React
-|-- server/             # API Fastify + Postgres
-|   |-- src/
-|   `-- .env.example
-|-- .env.example        # variables del frontend
-|-- package.json
-`-- vite.config.js
-```
 
 ## Modelo de datos
 
@@ -65,6 +50,8 @@ Se conserva la funcionalidad que ya tenía el sitio:
 - `created_at`
 - `updated_at`
 
+Aunque la tabla mantiene `display_name`, en la UI el dato visible para la cuenta es el `nick gamer`.
+
 ### `site_configs`
 
 - `id`
@@ -72,7 +59,7 @@ Se conserva la funcionalidad que ya tenía el sitio:
 - `updated_by`
 - `updated_at`
 
-El `data` guarda el mismo árbol dinámico del sitio:
+El `data` guarda el arbol dinamico del sitio:
 
 - `brand`
 - `navbar.items`
@@ -81,31 +68,19 @@ El `data` guarda el mismo árbol dinámico del sitio:
 - `tournament.groups`
 - `tournament.playoffs.rounds`
 
-## Autenticación real
+## Roles
 
-La sesión ahora se maneja con:
+Las cuentas nuevas se registran como `user`.
 
-- login real contra backend
-- registro de usuarios comunes
-- cookie `httpOnly`
-- JWT firmado en backend
-- control de permisos por rol
+Si quieres convertir una cuenta en admin, hazlo directamente en la base de datos:
 
-Solo los usuarios con `role = admin` pueden editar contenido.
+```sql
+update app_users
+set role = 'admin'
+where username = 'tu_nick_gamer';
+```
 
-## Admin inicial
-
-La API crea o actualiza automáticamente un admin inicial al arrancar usando estas variables:
-
-- `ADMIN_USERNAME`
-- `ADMIN_PASSWORD`
-- `ADMIN_NAME`
-- `ADMIN_EMAIL`
-
-Si no cambias nada, la semilla por defecto es:
-
-- usuario: `admin`
-- password: `uandes2026`
+No existe un admin inicial sembrado por defecto.
 
 ## Variables de entorno
 
@@ -133,13 +108,9 @@ SESSION_TTL_DAYS=7
 CORS_ORIGINS=http://localhost:5173
 COOKIE_SAME_SITE=lax
 COOKIE_SECURE=false
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=uandes2026
-ADMIN_NAME=Admin UANDES
-ADMIN_EMAIL=admin@uandes.cl
 ```
 
-## Cómo levantarlo localmente
+## Como levantarlo localmente
 
 ### 1. Base de datos
 
@@ -208,7 +179,7 @@ En desarrollo, Vite proxea `/api` hacia el backend.
 
 Crear `Static Site`:
 
-- `Root Directory`: vacío
+- `Root Directory`: vacio
 - `Build Command`: `npm run build`
 - `Publish Directory`: `dist`
 - `Environment Variable`: `VITE_API_BASE_URL=https://TU-API.onrender.com/api`
@@ -221,28 +192,25 @@ Crear `Web Service` apuntando a `server/`:
 - `Build Command`: `npm install`
 - `Start Command`: `npm start`
 
-Variables mínimas:
+Variables minimas:
 
 - `DATABASE_URL`
 - `JWT_SECRET`
 - `CORS_ORIGINS`
 - `COOKIE_SAME_SITE=none`
 - `COOKIE_SECURE=true`
-- `ADMIN_USERNAME`
-- `ADMIN_PASSWORD`
-- `ADMIN_NAME`
-- `ADMIN_EMAIL`
 
 ### Base de datos
 
 Crear `Render Postgres` y usar su `DATABASE_URL` en el backend.
 
-## Notas de implementación
+## Notas
 
-- El backend crea tablas automáticamente al iniciar.
-- El backend también siembra el `site_config` inicial y el admin inicial.
-- Si la API no responde, el frontend cae temporalmente al `defaultSiteConfig` para no dejar la web vacía.
-- La arquitectura sigue lista para crecer a media library real, revisiones de contenido, múltiples admins o auditoría.
+- El backend crea tablas automaticamente al iniciar.
+- El backend siembra el `site_config` inicial.
+- Si vienes de una version anterior, el backend elimina la cuenta default `admin@uandes.cl` con username `admin`.
+- Las cuentas nuevas nacen como `user`; el rol `admin` se asigna desde base de datos.
+- Si la API no responde, el frontend cae temporalmente al `defaultSiteConfig` para no dejar la web vacia.
 
 ## Archivos clave
 

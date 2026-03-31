@@ -193,7 +193,7 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
           <div className={styles.headerActions}>
             {isAuthenticated ? (
               <span className={styles.userBadge}>
-                {session?.name} - {session?.role}
+                {session?.name || session?.username} - {session?.role}
               </span>
             ) : null}
             {isAdmin ? (
@@ -238,12 +238,12 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
 
                   <div className={styles.accountMeta}>
                     <div>
-                      <span className={styles.accountLabel}>Nombre</span>
-                      <strong>{session.name}</strong>
+                      <span className={styles.accountLabel}>Nick gamer</span>
+                      <strong>{session.name || session.username}</strong>
                     </div>
                     <div>
-                      <span className={styles.accountLabel}>Usuario</span>
-                      <strong>{session.username}</strong>
+                      <span className={styles.accountLabel}>Email</span>
+                      <strong>{session.email}</strong>
                     </div>
                     <div>
                       <span className={styles.accountLabel}>Rol</span>

@@ -1,12 +1,9 @@
-import { randomUUID } from 'node:crypto';
 import {
   cloneData,
   normalizeSiteConfig,
 } from '../../../src/utils/siteConfigUtils.js';
 import { defaultSiteConfig } from '../../../src/data/defaultSiteConfig.js';
-import { env } from '../config/env.js';
 import { getClient } from '../lib/database.js';
-import { hashPassword } from '../lib/security.js';
 
 export async function initializeDatabase() {
   const client = await getClient();
@@ -36,32 +33,11 @@ export async function initializeDatabase() {
       );
     `);
 
-    const passwordHash = await hashPassword(env.adminPassword);
-
     await client.query(
-      `insert into app_users (
-        id,
-        username,
-        email,
-        display_name,
-        password_hash,
-        role
-      )
-      values ($1, $2, $3, $4, $5, 'admin')
-      on conflict (username)
-      do update set
-        email = excluded.email,
-        display_name = excluded.display_name,
-        password_hash = excluded.password_hash,
-        role = 'admin',
-        updated_at = now()`,
-      [
-        randomUUID(),
-        env.adminUsername.toLowerCase(),
-        env.adminEmail.toLowerCase(),
-        env.adminName,
-        passwordHash,
-      ],
+      `delete from app_users
+       where username = 'admin'
+         and email = 'admin@uandes.cl'
+         and role = 'admin'`,
     );
 
     const seededConfig = normalizeSiteConfig(cloneData(defaultSiteConfig));
