@@ -16,9 +16,20 @@ import {
 } from '../../utils/siteConfigUtils';
 
 function AdminPanel({ isOpen, onClose, activePageId }) {
-  const { session, isAdmin, logout } = useAuth();
+  const {
+    session,
+    isAdmin,
+    isAuthenticated,
+    isLoading: isAuthLoading,
+    logout,
+  } = useAuth();
   const {
     siteConfig,
+    isLoading: isSiteConfigLoading,
+    loadError,
+    saveStatus,
+    saveError,
+    lastSavedAt,
     createPage,
     createTournamentPage,
     updatePage,
@@ -65,6 +76,45 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
   );
   const selectedPageBlocks = sortByOrder(selectedPage?.blocks || []);
   const selectedPagePosition = getOrderedItemPosition(pages, selectedPageId);
+
+  function formatDateTime(value) {
+    if (!value) {
+      return '';
+    }
+
+    return new Date(value).toLocaleString('es-CL', {
+      dateStyle: 'short',
+      timeStyle: 'short',
+    });
+  }
+
+  function getSyncLabel() {
+    if (isSiteConfigLoading) {
+      return 'Cargando contenido';
+    }
+
+    if (saveStatus === 'saving') {
+      return 'Guardando cambios';
+    }
+
+    if (saveStatus === 'pending') {
+      return 'Cambios pendientes';
+    }
+
+    if (saveStatus === 'saved') {
+      return 'Sincronizado';
+    }
+
+    if (saveStatus === 'error') {
+      return 'Error de guardado';
+    }
+
+    if (loadError) {
+      return 'Modo respaldo';
+    }
+
+    return 'Sin cambios';
+  }
 
   useEffect(() => {
     if (activePageId && pages.some((page) => page.id === activePageId)) {
@@ -141,7 +191,14 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
           </div>
 
           <div className={styles.headerActions}>
-            {isAdmin ? <span className={styles.userBadge}>{session?.name}</span> : null}
+            {isAuthenticated ? (
+              <span className={styles.userBadge}>
+                {session?.name} - {session?.role}
+              </span>
+            ) : null}
+            {isAdmin ? (
+              <span className={styles.statusBadge}>{getSyncLabel()}</span>
+            ) : null}
             <button
               type="button"
               className={styles.closeButton}
@@ -155,7 +212,58 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
         {!isAdmin ? (
           <div className={styles.panelBody}>
             <div className={styles.loginShell}>
-              <LoginForm />
+              {isAuthLoading ? (
+                <section className={`${styles.sectionCard} ${styles.accountShell}`}>
+                  <div className={styles.sectionHeader}>
+                    <div>
+                      <p className={styles.sectionEyebrow}>Sesion</p>
+                      <h3>Cargando acceso</h3>
+                      <p>Estamos verificando si ya existe una sesion activa.</p>
+                    </div>
+                  </div>
+                </section>
+              ) : session ? (
+                <section className={`${styles.sectionCard} ${styles.accountShell}`}>
+                  <div className={styles.sectionHeader}>
+                    <div>
+                      <p className={styles.sectionEyebrow}>Cuenta</p>
+                      <h3>Sesion iniciada</h3>
+                      <p>
+                        Tu cuenta puede navegar el sitio normalmente. Solo las
+                        cuentas con rol admin pueden editar paginas, bloques y
+                        torneos.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className={styles.accountMeta}>
+                    <div>
+                      <span className={styles.accountLabel}>Nombre</span>
+                      <strong>{session.name}</strong>
+                    </div>
+                    <div>
+                      <span className={styles.accountLabel}>Usuario</span>
+                      <strong>{session.username}</strong>
+                    </div>
+                    <div>
+                      <span className={styles.accountLabel}>Rol</span>
+                      <strong>{session.role}</strong>
+                    </div>
+                  </div>
+
+                  <div className={styles.controlStack}>
+                    <button
+                      type="button"
+                      className={formStyles.secondaryButton}
+                      onClick={logout}
+                    >
+                      Cerrar sesion
+                    </button>
+                  </div>
+                </section>
+              ) : (
+                <LoginForm />
+              )}
             </div>
           </div>
         ) : (
@@ -317,6 +425,14 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
                             }`
                           : 'Selecciona una pagina desde la columna lateral.'}
                       </p>
+                    </div>
+                    <div className={styles.syncMeta}>
+                      <span className={styles.statusBadge}>{getSyncLabel()}</span>
+                      {lastSavedAt ? (
+                        <small>Ultima sincronizacion: {formatDateTime(lastSavedAt)}</small>
+                      ) : null}
+                      {saveError ? <small>{saveError}</small> : null}
+                      {!saveError && loadError ? <small>{loadError}</small> : null}
                     </div>
                   </div>
 

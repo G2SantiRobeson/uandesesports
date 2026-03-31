@@ -1,33 +1,28 @@
+import { API_CONFIG } from '../config/api';
 import { defaultSiteConfig } from '../data/defaultSiteConfig';
 import { cloneData, normalizeSiteConfig } from '../utils/siteConfigUtils';
+import { apiRequest } from './httpClient';
 
-const SITE_CONFIG_STORAGE_KEY = 'uandes-esports:site-config:v2';
-
-export function loadSiteConfig() {
-  try {
-    const storedValue = window.localStorage.getItem(SITE_CONFIG_STORAGE_KEY);
-
-    if (!storedValue) {
-      return normalizeSiteConfig(cloneData(defaultSiteConfig));
-    }
-
-    const parsedConfig = JSON.parse(storedValue);
-    return normalizeSiteConfig(parsedConfig);
-  } catch (error) {
-    console.error('No fue posible leer siteConfig desde localStorage.', error);
-    return normalizeSiteConfig(cloneData(defaultSiteConfig));
-  }
+export function getDefaultSiteConfig() {
+  return normalizeSiteConfig(cloneData(defaultSiteConfig));
 }
 
-export function saveSiteConfig(siteConfig) {
-  // Reemplazar localStorage por una API real aqui cuando exista backend.
-  window.localStorage.setItem(
-    SITE_CONFIG_STORAGE_KEY,
-    JSON.stringify(siteConfig),
-  );
+export async function loadSiteConfig() {
+  const response = await apiRequest(API_CONFIG.endpoints.siteConfig);
+  return normalizeSiteConfig(response.siteConfig || response);
+}
+
+export async function saveSiteConfig(siteConfig) {
+  const response = await apiRequest(API_CONFIG.endpoints.siteConfig, {
+    method: 'PUT',
+    body: {
+      siteConfig,
+    },
+  });
+
+  return normalizeSiteConfig(response.siteConfig || response);
 }
 
 export function resetSiteConfig() {
-  window.localStorage.removeItem(SITE_CONFIG_STORAGE_KEY);
-  return normalizeSiteConfig(cloneData(defaultSiteConfig));
+  return getDefaultSiteConfig();
 }

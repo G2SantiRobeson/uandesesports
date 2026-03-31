@@ -8,10 +8,17 @@ function Navbar({
   pages,
   activeSlug,
   isAdmin,
+  isAuthenticated,
+  session,
   onAdminToggle,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const homePage = pages.find((page) => page.visible) || pages[0];
+  const accessLabel = isAdmin
+    ? 'Panel Admin'
+    : isAuthenticated
+      ? session?.name || session?.username || 'Mi cuenta'
+      : 'Ingresar';
 
   function handleToggle() {
     setIsOpen((currentState) => !currentState);
@@ -52,7 +59,7 @@ function Navbar({
             className={styles.adminButton}
             onClick={onAdminToggle}
           >
-            {isAdmin ? 'Panel Admin' : navbar.adminLabel || 'Admin'}
+            {accessLabel}
           </button>
 
           <button

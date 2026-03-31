@@ -14,6 +14,37 @@
     rgba(255, 255, 255, 0.018);
 }
 
+.authHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tabRow {
+  display: inline-flex;
+  padding: 0.3rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.tabButton {
+  min-height: 2.45rem;
+  padding: 0.6rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--soft);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.tabButtonActive {
+  background: rgba(137, 174, 190, 0.12);
+  color: var(--text);
+}
+
 .blockShell {
   gap: 1rem;
   padding: 1rem 1.05rem 1.05rem;
@@ -318,6 +349,10 @@
 }
 
 @media (max-width: 720px) {
+  .authHeader {
+    flex-direction: column;
+  }
+
   .row {
     grid-template-columns: 1fr;
   }

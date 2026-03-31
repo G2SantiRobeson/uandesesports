@@ -11,7 +11,7 @@ import { sortByOrder } from './utils/siteConfigUtils';
 
 function App() {
   const { siteConfig } = useSiteConfig();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isAuthenticated, session } = useAuth();
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [activeSlug, setActiveSlug] = useState(() => getSlugFromHash() || '');
 
@@ -58,6 +58,8 @@ function App() {
         pages={siteConfig.pages}
         activeSlug={activePage?.slug}
         isAdmin={isAdmin}
+        isAuthenticated={isAuthenticated}
+        session={session}
         onAdminToggle={() => setIsAdminPanelOpen(true)}
       />
 

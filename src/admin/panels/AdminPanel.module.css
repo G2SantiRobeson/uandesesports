@@ -71,6 +71,7 @@
 }
 
 .userBadge,
+.statusBadge,
 .closeButton {
   min-height: 2.75rem;
   padding: 0.78rem 1rem;
@@ -78,6 +79,11 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
+}
+
+.statusBadge {
+  color: var(--accent-strong);
+  background: rgba(137, 174, 190, 0.08);
 }
 
 .closeButton {
@@ -93,6 +99,33 @@
   height: 100%;
   overflow: auto;
   padding: 1.5rem;
+}
+
+.accountShell {
+  max-width: 720px;
+}
+
+.accountMeta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.accountMeta > div {
+  display: grid;
+  gap: 0.32rem;
+  padding: 1rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.accountLabel {
+  color: var(--soft);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 700;
 }
 
 .workspace {
@@ -183,6 +216,17 @@
   gap: 0.2rem;
   padding-bottom: 0.2rem;
   border-bottom: 1px solid var(--line-soft);
+}
+
+.syncMeta {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+}
+
+.syncMeta small {
+  color: var(--soft);
+  line-height: 1.5;
 }
 
 .primaryActions {
@@ -308,6 +352,10 @@
   .sidebar {
     border-right: 0;
     border-bottom: 1px solid var(--line-soft);
+  }
+
+  .accountMeta {
+    grid-template-columns: 1fr;
   }
 }
 

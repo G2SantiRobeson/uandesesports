@@ -1,5 +1,13 @@
-import { createContext, useContext, useEffect, useState } from 'react';
 import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { useAuth } from './AuthContext';
+import {
+  getDefaultSiteConfig,
   loadSiteConfig,
   resetSiteConfig,
   saveSiteConfig,
@@ -48,13 +56,100 @@ function updateTournamentPageCollection(pages, pageId, callback) {
 }
 
 export function SiteConfigProvider({ children }) {
-  const [siteConfig, setSiteConfig] = useState(() => loadSiteConfig());
+  const { isAdmin } = useAuth();
+  const [siteConfig, setSiteConfig] = useState(() => getDefaultSiteConfig());
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [saveStatus, setSaveStatus] = useState('idle');
+  const [saveError, setSaveError] = useState('');
+  const [lastSavedAt, setLastSavedAt] = useState('');
+  const hasHydratedRef = useRef(false);
+  const isDirtyRef = useRef(false);
+  const saveTimeoutRef = useRef(null);
 
   useEffect(() => {
-    saveSiteConfig(siteConfig);
-  }, [siteConfig]);
+    let isMounted = true;
+
+    async function hydrateSiteConfig() {
+      setIsLoading(true);
+      setLoadError('');
+
+      try {
+        const nextSiteConfig = await loadSiteConfig();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setSiteConfig(nextSiteConfig);
+        setLastSavedAt(new Date().toISOString());
+      } catch (error) {
+        console.error('No fue posible cargar siteConfig desde la API.', error);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setLoadError(error.message);
+        setSiteConfig(getDefaultSiteConfig());
+      } finally {
+        if (isMounted) {
+          hasHydratedRef.current = true;
+          setIsLoading(false);
+        }
+      }
+    }
+
+    hydrateSiteConfig();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hasHydratedRef.current || !isDirtyRef.current || !isAdmin) {
+      return undefined;
+    }
+
+    setSaveStatus('saving');
+    window.clearTimeout(saveTimeoutRef.current);
+
+    saveTimeoutRef.current = window.setTimeout(async () => {
+      try {
+        const persistedSiteConfig = await saveSiteConfig(siteConfig);
+        isDirtyRef.current = false;
+        setSiteConfig(persistedSiteConfig);
+        setSaveStatus('saved');
+        setSaveError('');
+        setLastSavedAt(new Date().toISOString());
+      } catch (error) {
+        console.error('No fue posible guardar siteConfig en la API.', error);
+        setSaveStatus('error');
+        setSaveError(error.message);
+      }
+    }, 550);
+
+    return () => {
+      window.clearTimeout(saveTimeoutRef.current);
+    };
+  }, [isAdmin, siteConfig]);
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(saveTimeoutRef.current);
+    },
+    [],
+  );
 
   function applyConfigUpdate(updater) {
+    setSaveError('');
+
+    if (isAdmin) {
+      isDirtyRef.current = true;
+      setSaveStatus('pending');
+    }
+
     setSiteConfig((currentConfig) => normalizeSiteConfig(updater(currentConfig)));
   }
 
@@ -648,13 +743,18 @@ export function SiteConfigProvider({ children }) {
   }
 
   function restoreDefaults() {
-    setSiteConfig(resetSiteConfig());
+    applyConfigUpdate(() => resetSiteConfig());
   }
 
   return (
     <SiteConfigContext.Provider
       value={{
         siteConfig,
+        isLoading,
+        loadError,
+        saveStatus,
+        saveError,
+        lastSavedAt,
         createPage,
         createTournamentPage,
         updatePage,

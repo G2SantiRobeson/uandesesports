@@ -115,10 +115,10 @@ export const defaultSiteConfig = {
             eyebrow: 'Sobre UANDES Esports',
             title: 'Una estructura digital pensada para comunicar con claridad.',
             body:
-              'UANDES Esports necesita una presencia digital que se vea profesional en contexto universitario, pero que siga hablando el lenguaje del ecosistema competitivo. Esta base prioriza orden visual, rapidez, mantenibilidad y futura integracion con una API o base de datos.',
+              'UANDES Esports necesita una presencia digital que se vea profesional en contexto universitario, pero que siga hablando el lenguaje del ecosistema competitivo. Esta base prioriza orden visual, rapidez, mantenibilidad y una integracion real con API y base de datos.',
             highlightLabel: 'Base lista para evolucionar',
             highlightText:
-              'La arquitectura ahora es config-driven: paginas, navbar y bloques se administran desde la interfaz y persisten en localStorage.',
+              'La arquitectura ahora es config-driven: paginas, navbar y bloques se administran desde la interfaz y persisten en una API real con base de datos.',
           },
         },
         {
@@ -311,7 +311,7 @@ export const defaultSiteConfig = {
             eyebrow: 'Staff y equipo',
             title: 'Un equipo de apoyo que sostiene la operacion.',
             description:
-              'El staff queda modelado como coleccion editable para que mas adelante pueda venir desde una API o base de datos.',
+              'El staff queda modelado como coleccion editable y sincronizable para que el equipo pueda administrarlo desde una fuente de datos real.',
             items: [
               {
                 id: 'staff-item-1',
@@ -378,7 +378,7 @@ export const defaultSiteConfig = {
             eyebrow: 'Proximos eventos',
             title: 'Calendario visible para competencia, comunidad y torneos.',
             description:
-              'La agenda queda modelada como bloque editable y lista para ser persistida fuera de localStorage en una fase posterior.',
+              'La agenda queda modelada como bloque editable y se sincroniza con la API para mantener una experiencia administrable real.',
             items: [
               {
                 id: 'event-item-1',
@@ -448,10 +448,10 @@ export const defaultSiteConfig = {
     eyebrow: 'UANDES Esports',
     title: 'Competencia, comunidad y representacion universitaria.',
     description:
-      'Proyecto preparado para crecer con nuevas divisiones, calendario competitivo e integraciones futuras con API o base de datos.',
+      'Proyecto preparado para crecer con nuevas divisiones, calendario competitivo y una capa real de autenticacion, API y base de datos.',
     contactEmail: 'esports@uandes.cl',
     location: 'Universidad de los Andes, Santiago de Chile',
-    copyright: '(c) 2026 UANDES Esports. Base frontend lista para evolucionar.',
+    copyright: '(c) 2026 UANDES Esports. Plataforma dinamica con backend y persistencia real.',
     socialLinks: [
       { id: 'social-1', label: 'Instagram', href: 'https://instagram.com', visible: true },
       { id: 'social-2', label: 'X / Twitter', href: 'https://x.com', visible: true },

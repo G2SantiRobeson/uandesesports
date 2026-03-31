@@ -1,44 +1,54 @@
-const SESSION_STORAGE_KEY = 'uandes-esports:session:v1';
+import { API_CONFIG } from '../config/api';
+import { apiRequest } from './httpClient';
 
-const adminAccount = {
-  username: 'admin',
-  password: 'uandes2026',
-  role: 'Admin',
-  name: 'Admin UANDES',
-};
+export async function loadSession() {
+  const response = await apiRequest(API_CONFIG.endpoints.auth.session);
+  return response.session || null;
+}
 
-export function loadSession() {
+export async function loginWithCredentials(identifier, password) {
   try {
-    const storedValue = window.localStorage.getItem(SESSION_STORAGE_KEY);
-    return storedValue ? JSON.parse(storedValue) : null;
-  } catch (error) {
-    console.error('No fue posible leer la sesion.', error);
-    return null;
-  }
-}
+    const response = await apiRequest(API_CONFIG.endpoints.auth.login, {
+      method: 'POST',
+      body: {
+        identifier,
+        password,
+      },
+    });
 
-export function loginWithCredentials(username, password) {
-  if (
-    username.trim() === adminAccount.username &&
-    password.trim() === adminAccount.password
-  ) {
-    const session = {
-      role: adminAccount.role,
-      name: adminAccount.name,
-      username: adminAccount.username,
+    return {
+      success: true,
+      session: response.session,
     };
-
-    // Reemplazar este guardado por autenticacion real cuando exista backend.
-    window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
-    return { success: true, session };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
   }
-
-  return {
-    success: false,
-    error: 'Credenciales invalidas. Usa admin / uandes2026.',
-  };
 }
 
-export function clearSession() {
-  window.localStorage.removeItem(SESSION_STORAGE_KEY);
+export async function registerWithCredentials(payload) {
+  try {
+    const response = await apiRequest(API_CONFIG.endpoints.auth.register, {
+      method: 'POST',
+      body: payload,
+    });
+
+    return {
+      success: true,
+      session: response.session,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
+
+export async function clearSession() {
+  await apiRequest(API_CONFIG.endpoints.auth.logout, {
+    method: 'POST',
+  });
 }
