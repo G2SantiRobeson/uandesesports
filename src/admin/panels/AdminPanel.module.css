@@ -357,6 +357,16 @@
   gap: 0.75rem;
 }
 
+.sidebar > .sectionCard:first-child {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-color: rgba(137, 174, 190, 0.18);
+  box-shadow:
+    0 18px 34px rgba(3, 9, 15, 0.18),
+    0 0 0 1px rgba(137, 174, 190, 0.05);
+}
+
 .manualSaveMeta {
   display: grid;
   gap: 0.45rem;
@@ -457,6 +467,10 @@
 
   .accountMeta {
     grid-template-columns: 1fr;
+  }
+
+  .sidebar > .sectionCard:first-child {
+    position: static;
   }
 }
 

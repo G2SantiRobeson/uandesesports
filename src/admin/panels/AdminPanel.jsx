@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import BlockEditorForm from '../forms/BlockEditorForm';
 import FooterSettingsForm from '../forms/FooterSettingsForm';
 import LoginForm from '../forms/LoginForm';
@@ -71,6 +71,7 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
   const [newPageName, setNewPageName] = useState('');
   const [newTournamentName, setNewTournamentName] = useState('');
   const [newBlockType, setNewBlockType] = useState('text');
+  const previousIsOpenRef = useRef(isOpen);
 
   const pages = sortByOrder(siteConfig.pages);
   const selectedPage = pages.find((page) => page.id === selectedPageId) || null;
@@ -128,10 +129,18 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
   }
 
   useEffect(() => {
-    if (activePageId && pages.some((page) => page.id === activePageId)) {
-      setSelectedPageId(activePageId);
+    const wasOpen = previousIsOpenRef.current;
+
+    if (isOpen && !wasOpen) {
+      if (activePageId && pages.some((page) => page.id === activePageId)) {
+        setSelectedPageId(activePageId);
+      } else {
+        setSelectedPageId(pages[0]?.id || '');
+      }
     }
-  }, [activePageId, pages]);
+
+    previousIsOpenRef.current = isOpen;
+  }, [activePageId, isOpen, pages]);
 
   useEffect(() => {
     if (!selectedPageId && pages[0]) {
@@ -308,6 +317,64 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
                 <section className={`${styles.sectionCard} ${styles.sidebarCard}`}>
                   <div className={styles.sectionHeader}>
                     <div>
+                      <p className={styles.sectionEyebrow}>Guardado manual</p>
+                      <h3>Control de cambios</h3>
+                      <p>
+                        Guarda o descarta el borrador actual desde este punto
+                        fijo antes de seguir navegando por el panel.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className={styles.manualSaveActions}>
+                    <button
+                      type="button"
+                      className={formStyles.button}
+                      onClick={handleSaveChanges}
+                      disabled={
+                        isSiteConfigLoading ||
+                        saveStatus === 'saving' ||
+                        !hasUnsavedChanges
+                      }
+                    >
+                      Guardar cambios
+                    </button>
+                    <button
+                      type="button"
+                      className={formStyles.secondaryButton}
+                      onClick={discardChanges}
+                      disabled={
+                        isSiteConfigLoading ||
+                        saveStatus === 'saving' ||
+                        !hasUnsavedChanges
+                      }
+                    >
+                      Descartar cambios
+                    </button>
+                  </div>
+
+                  <div className={styles.manualSaveMeta}>
+                    <span className={styles.statusBadge}>{getSyncLabel()}</span>
+                    {hasUnsavedChanges ? (
+                      <small>
+                        Tienes un borrador local. Nada se guarda hasta pulsar
+                        "Guardar cambios".
+                      </small>
+                    ) : (
+                      <small>
+                        {lastSavedAt
+                          ? `Ultimo guardado: ${formatDateTime(lastSavedAt)}`
+                          : 'No hay cambios pendientes por guardar.'}
+                      </small>
+                    )}
+                    {saveError ? <small>{saveError}</small> : null}
+                    {!saveError && loadError ? <small>{loadError}</small> : null}
+                  </div>
+                </section>
+
+                <section className={`${styles.sectionCard} ${styles.sidebarCard}`}>
+                  <div className={styles.sectionHeader}>
+                    <div>
                       <p className={styles.sectionEyebrow}>Navegacion</p>
                       <h3>Paginas y pestanas</h3>
                       <p>
@@ -408,64 +475,6 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
                         </button>
                       );
                     })}
-                  </div>
-                </section>
-
-                <section className={`${styles.sectionCard} ${styles.sidebarCard}`}>
-                  <div className={styles.sectionHeader}>
-                    <div>
-                      <p className={styles.sectionEyebrow}>Guardado manual</p>
-                      <h3>Control de cambios</h3>
-                      <p>
-                        Edita libremente y decide cuando persistir el borrador
-                        actual en la base de datos.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className={styles.manualSaveActions}>
-                    <button
-                      type="button"
-                      className={formStyles.button}
-                      onClick={handleSaveChanges}
-                      disabled={
-                        isSiteConfigLoading ||
-                        saveStatus === 'saving' ||
-                        !hasUnsavedChanges
-                      }
-                    >
-                      Guardar cambios
-                    </button>
-                    <button
-                      type="button"
-                      className={formStyles.secondaryButton}
-                      onClick={discardChanges}
-                      disabled={
-                        isSiteConfigLoading ||
-                        saveStatus === 'saving' ||
-                        !hasUnsavedChanges
-                      }
-                    >
-                      Descartar cambios
-                    </button>
-                  </div>
-
-                  <div className={styles.manualSaveMeta}>
-                    <span className={styles.statusBadge}>{getSyncLabel()}</span>
-                    {hasUnsavedChanges ? (
-                      <small>
-                        Tienes un borrador local. Nada se guarda hasta pulsar
-                        "Guardar cambios".
-                      </small>
-                    ) : (
-                      <small>
-                        {lastSavedAt
-                          ? `Ultimo guardado: ${formatDateTime(lastSavedAt)}`
-                          : 'No hay cambios pendientes por guardar.'}
-                      </small>
-                    )}
-                    {saveError ? <small>{saveError}</small> : null}
-                    {!saveError && loadError ? <small>{loadError}</small> : null}
                   </div>
                 </section>
 
