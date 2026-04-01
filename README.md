@@ -1,45 +1,106 @@
 # UANDES Esports
 
-Plataforma institucional de UANDES Esports con frontend en `Vite + React`, API en `Fastify` y persistencia real en `PostgreSQL`.
+UANDES Esports is a full-stack web platform for managing and publishing the institutional esports presence of Universidad de los Andes.
 
-## Arquitectura
+The project combines a public-facing landing site with a configurable admin experience for navigation, content blocks, tournament pages, team information, news, events, and staff data.
 
-La UI publica sigue siendo `config-driven`: navbar, paginas, bloques normales y paginas de torneo se renderizan desde un `siteConfig`.
+## Overview
 
-Ahora ese `siteConfig` ya no se guarda en `localStorage`. Se lee y escribe en una API conectada a PostgreSQL.
+This repository contains:
+
+- a `Vite + React` frontend for the public site and admin UI
+- a lightweight `Fastify` API for authentication and content persistence
+- a `PostgreSQL` data layer for users and site configuration
+
+The public website is config-driven. Navigation, pages, blocks, and tournament views are rendered from a single persisted `siteConfig` instead of being hardcoded into the UI.
+
+## Tech Stack
+
+- Frontend: `React`, `Vite`, `CSS Modules`
+- Backend: `Fastify`, `JWT`, `@fastify/cookie`, `@fastify/cors`
+- Database: `PostgreSQL`
+- Deployment target: `Render` (`Static Site` + `Web Service` + `Postgres`)
+
+## Core Capabilities
+
+- Dynamic navigation managed from the admin panel
+- Configurable standard pages with editable blocks
+- Tournament pages with:
+  - group stage tables
+  - editable playoff rounds and matches
+  - round-based match limits
+  - team logos and match visuals by image URL
+- Real user accounts with `user` and `admin` roles
+- Persistent site configuration stored in PostgreSQL
+- Responsive dark UI for both public site and admin workspace
+
+## Architecture
 
 ```text
 frontend (Vite + React)
-|-- UI publica
-|-- panel admin
-|-- login / registro
-`-- consumo de /api
+|-- public website
+|-- admin panel
+|-- login / register flow
+`-- API client layer
 
 backend (Fastify)
-|-- auth por cookie + JWT
-|-- permisos por rol
-|-- lectura/escritura de siteConfig
-`-- bootstrap automatico de tablas
+|-- auth routes
+|-- siteConfig routes
+|-- session / role validation
+`-- database bootstrap
 
 database (PostgreSQL)
 |-- app_users
 `-- site_configs
 ```
 
-## Lo que se mantiene
+### Config-Driven Rendering
 
-- paginas y navegacion dinamicas
-- bloques editables por tipo
-- paginas de torneo
-- fase de grupos con standings
-- playoffs por rondas
-- limites por ronda en cruces
-- imagenes por URL en bloques y torneos
-- panel admin visual
+The frontend renders the site from a dynamic `siteConfig` object that includes:
 
-## Modelo de datos
+- brand metadata
+- navbar items
+- pages
+- page blocks
+- tournament groups
+- tournament playoffs and matches
+- footer content
+
+This makes the site extensible without rewriting JSX for every new section or tournament.
+
+## Repository Structure
+
+```text
+.
+|-- server/
+|   |-- src/
+|   |   |-- bootstrap/
+|   |   |-- config/
+|   |   |-- lib/
+|   |   |-- plugins/
+|   |   |-- repositories/
+|   |   `-- routes/
+|   |-- .env.example
+|   `-- package.json
+|-- src/
+|   |-- admin/
+|   |-- components/
+|   |-- config/
+|   |-- context/
+|   |-- data/
+|   |-- services/
+|   |-- styles/
+|   `-- utils/
+|-- .env.example
+|-- package.json
+`-- vite.config.js
+```
+
+## Data Model
 
 ### `app_users`
+
+Stores user accounts and roles.
 
 - `id`
 - `username`
@@ -50,52 +111,47 @@ database (PostgreSQL)
 - `created_at`
 - `updated_at`
 
-Aunque la tabla mantiene `display_name`, en la UI el dato visible para la cuenta es el `nick gamer`.
+Although the table includes `display_name`, the visible account identity in the UI is the user's gamer nick.
 
 ### `site_configs`
 
+Stores the full website configuration as `jsonb`.
+
 - `id`
-- `data` (`jsonb`)
+- `data`
 - `updated_by`
 - `updated_at`
 
-El `data` guarda el arbol dinamico del sitio:
+## Authentication and Roles
 
-- `brand`
-- `navbar.items`
-- `pages`
-- `blocks`
-- `tournament.groups`
-- `tournament.playoffs.rounds`
+- New registrations are created as `user`
+- Admin editing permissions are enforced in the backend
+- Public content can be read without admin access
 
-## Roles
+There is no seeded default admin account.
 
-Las cuentas nuevas se registran como `user`.
-
-Si quieres convertir una cuenta en admin, hazlo directamente en la base de datos:
+To promote an existing user to admin, update the database manually:
 
 ```sql
 update app_users
 set role = 'admin'
-where username = 'tu_nick_gamer';
+where username = 'your_gamer_nick';
 ```
 
-No existe un admin inicial sembrado por defecto.
+## Environment Variables
 
-## Variables de entorno
+### Frontend
 
-### Frontend `.env`
-
-Usa [.env.example](./.env.example) como base:
+Use [.env.example](./.env.example) as a base:
 
 ```env
 VITE_API_BASE_URL=http://localhost:4000/api
 VITE_DEV_API_PROXY=http://localhost:4000
 ```
 
-### Backend `server/.env`
+### Backend
 
-Usa [server/.env.example](./server/.env.example) como base:
+Use [server/.env.example](./server/.env.example) as a base:
 
 ```env
 PORT=4000
@@ -110,15 +166,20 @@ COOKIE_SAME_SITE=lax
 COOKIE_SECURE=false
 ```
 
-## Como levantarlo localmente
+## Local Development
 
-### 1. Base de datos
+### Prerequisites
 
-Levanta un PostgreSQL local y crea una base, por ejemplo:
+- Node.js 18+
+- PostgreSQL
 
-- base: `uandesesports`
+### 1. Create a local database
 
-### 2. Backend
+Create a PostgreSQL database, for example:
+
+- database name: `uandesesports`
+
+### 2. Start the backend
 
 ```bash
 cd server
@@ -126,22 +187,30 @@ npm install
 npm run dev
 ```
 
-La API arranca por defecto en `http://localhost:4000`.
+The API runs by default at:
 
-### 3. Frontend
+```txt
+http://localhost:4000
+```
 
-En otra terminal:
+### 3. Start the frontend
+
+In a separate terminal:
 
 ```bash
 npm install
 npm run dev
 ```
 
-El frontend arranca por defecto en `http://localhost:5173`.
+The frontend runs by default at:
 
-En desarrollo, Vite proxea `/api` hacia el backend.
+```txt
+http://localhost:5173
+```
 
-## Scripts principales
+During local development, Vite proxies `/api` requests to the backend.
+
+## Available Scripts
 
 ### Frontend
 
@@ -155,7 +224,7 @@ En desarrollo, Vite proxea `/api` hacia el backend.
 - `cd server && npm run dev`
 - `cd server && npm start`
 
-## Endpoints principales
+## API Endpoints
 
 ### Auth
 
@@ -164,7 +233,7 @@ En desarrollo, Vite proxea `/api` hacia el backend.
 - `POST /api/auth/register`
 - `POST /api/auth/logout`
 
-### Site config
+### Site Configuration
 
 - `GET /api/site-config`
 - `PUT /api/site-config` (`admin` only)
@@ -173,26 +242,32 @@ En desarrollo, Vite proxea `/api` hacia el backend.
 
 - `GET /api/health`
 
-## Flujo de despliegue en Render
+## Deployment
+
+The intended production setup uses Render:
 
 ### Frontend
 
-Crear `Static Site`:
+Deploy as `Static Site`:
 
-- `Root Directory`: vacio
+- `Root Directory`: empty
 - `Build Command`: `npm run build`
 - `Publish Directory`: `dist`
-- `Environment Variable`: `VITE_API_BASE_URL=https://TU-API.onrender.com/api`
+- environment variable:
+
+```env
+VITE_API_BASE_URL=https://YOUR_API.onrender.com/api
+```
 
 ### Backend
 
-Crear `Web Service` apuntando a `server/`:
+Deploy as `Web Service`:
 
 - `Root Directory`: `server`
 - `Build Command`: `npm install`
 - `Start Command`: `npm start`
 
-Variables minimas:
+Recommended backend environment variables:
 
 - `DATABASE_URL`
 - `JWT_SECRET`
@@ -200,25 +275,33 @@ Variables minimas:
 - `COOKIE_SAME_SITE=none`
 - `COOKIE_SECURE=true`
 
-### Base de datos
+### Database
 
-Crear `Render Postgres` y usar su `DATABASE_URL` en el backend.
+Deploy `Render Postgres` and use:
 
-## Notas
+- `Internal Database URL` for the Render web service
+- `External Database URL` for external clients such as DBeaver
 
-- El backend crea tablas automaticamente al iniciar.
-- El backend siembra el `site_config` inicial.
-- Si vienes de una version anterior, el backend elimina la cuenta default `admin@uandes.cl` con username `admin`.
-- Las cuentas nuevas nacen como `user`; el rol `admin` se asigna desde base de datos.
-- Si la API no responde, el frontend cae temporalmente al `defaultSiteConfig` para no dejar la web vacia.
+## Operational Notes
 
-## Archivos clave
+- The backend bootstraps required tables automatically on startup
+- The backend seeds the initial `site_config` only if it does not already exist
+- The frontend can fall back to the bundled default config if the API is temporarily unavailable
+- Role-based editing is enforced server-side
 
+## Key Files
+
+- [src/App.jsx](./src/App.jsx)
 - [src/context/AuthContext.jsx](./src/context/AuthContext.jsx)
 - [src/context/SiteConfigContext.jsx](./src/context/SiteConfigContext.jsx)
 - [src/services/authService.js](./src/services/authService.js)
 - [src/services/siteConfigService.js](./src/services/siteConfigService.js)
 - [server/src/index.js](./server/src/index.js)
 - [server/src/bootstrap/initializeDatabase.js](./server/src/bootstrap/initializeDatabase.js)
+- [server/src/plugins/sessionAuth.js](./server/src/plugins/sessionAuth.js)
 - [server/src/routes/authRoutes.js](./server/src/routes/authRoutes.js)
 - [server/src/routes/siteConfigRoutes.js](./server/src/routes/siteConfigRoutes.js)
+
+## Status
+
+This repository is under active development and continues to evolve as the UANDES Esports platform grows.

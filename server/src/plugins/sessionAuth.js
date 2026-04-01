@@ -1,3 +1,4 @@
+import fp from 'fastify-plugin';
 import { env } from '../config/env.js';
 import { verifySessionToken } from '../lib/security.js';
 import { findUserById } from '../repositories/userRepository.js';
@@ -30,7 +31,7 @@ function getBodyToken(requestBody) {
   return typeof bodyToken === 'string' ? bodyToken.trim() : '';
 }
 
-export default async function sessionAuthPlugin(app) {
+async function sessionAuthPlugin(app) {
   app.decorateRequest('sessionUser', null);
   app.decorateRequest('authFailureReason', '');
 
@@ -77,3 +78,7 @@ export default async function sessionAuthPlugin(app) {
     }
   });
 }
+
+export default fp(sessionAuthPlugin, {
+  name: 'session-auth',
+});
