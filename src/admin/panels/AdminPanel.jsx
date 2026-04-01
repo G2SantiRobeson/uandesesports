@@ -30,6 +30,7 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
     saveStatus,
     saveError,
     lastSavedAt,
+    hasUnsavedChanges,
     createPage,
     createTournamentPage,
     updatePage,
@@ -61,6 +62,8 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
     updateBrand,
     updateFooter,
     replaceFooterLinks,
+    saveChanges,
+    discardChanges,
     restoreDefaults,
   } = useSiteConfig();
 
@@ -98,11 +101,11 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
     }
 
     if (saveStatus === 'pending') {
-      return 'Cambios pendientes';
+      return 'Cambios sin guardar';
     }
 
     if (saveStatus === 'saved') {
-      return 'Sincronizado';
+      return 'Guardado';
     }
 
     if (saveStatus === 'error') {
@@ -114,6 +117,14 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
     }
 
     return 'Sin cambios';
+  }
+
+  async function handleSaveChanges() {
+    try {
+      await saveChanges();
+    } catch (error) {
+      // El contexto ya publica el estado y el mensaje de error.
+    }
   }
 
   useEffect(() => {
@@ -179,6 +190,9 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
       ? 'Tu sesion esta activa. Puedes cerrar el panel o salir de tu cuenta cuando quieras.'
       : 'Accede con tu nick gamer o registrate para usar una cuenta real dentro de la plataforma.'
     : 'Administra navegacion, paginas, bloques, torneos y contenido editable sin tocar el codigo fuente.';
+  const closeHint = isAuthenticated
+    ? 'La X roja cierra solo este panel. Usa "Cerrar sesion" para salir de tu cuenta.'
+    : 'La X roja cierra solo este panel.';
 
   if (!isOpen) {
     return null;
@@ -194,30 +208,39 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
         onClick={(event) => event.stopPropagation()}
       >
         <div className={styles.panelHeader}>
-          <div className={styles.panelHeaderCopy}>
-            <p className={styles.eyebrow}>{headerEyebrow}</p>
-            <h2>{headerTitle}</h2>
-            <p className={styles.panelDescription}>{headerDescription}</p>
+          <div className={styles.panelHeaderMain}>
+            <div className={styles.panelHeaderCopy}>
+              <p className={styles.eyebrow}>{headerEyebrow}</p>
+              <h2>{headerTitle}</h2>
+              <p className={styles.panelDescription}>{headerDescription}</p>
+            </div>
+
+            <div className={styles.headerActions}>
+              <div className={styles.headerBadges}>
+                {isAuthenticated ? (
+                  <span className={styles.userBadge}>
+                    {session?.name || session?.username} - {session?.role}
+                  </span>
+                ) : null}
+                {isAdmin ? (
+                  <span className={styles.statusBadge}>{getSyncLabel()}</span>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                className={`${styles.closeButton} ${styles.closeButtonDanger}`}
+                onClick={onClose}
+                aria-label="Cerrar panel"
+                title="Cerrar panel"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
           </div>
 
-          <div className={styles.headerActions}>
-            {isAuthenticated ? (
-              <span className={styles.userBadge}>
-                {session?.name || session?.username} - {session?.role}
-              </span>
-            ) : null}
-            {isAdmin ? (
-              <span className={styles.statusBadge}>{getSyncLabel()}</span>
-            ) : null}
-            <button
-              type="button"
-              className={`${styles.closeButton} ${
-                isAccessMode ? styles.closeButtonDanger : ''
-              }`}
-              onClick={onClose}
-            >
-              Cerrar
-            </button>
+          <div className={styles.headerHintBar}>
+            <span className={styles.headerHintTag}>Panel</span>
+            <p className={styles.headerHintCopy}>{closeHint}</p>
           </div>
         </div>
 
@@ -269,7 +292,7 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
                       className={formStyles.secondaryButton}
                       onClick={logout}
                     >
-                      Cerrar sesion
+                      Cerrar sesion de esta cuenta
                     </button>
                   </div>
                 </section>
@@ -391,8 +414,70 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
                 <section className={`${styles.sectionCard} ${styles.sidebarCard}`}>
                   <div className={styles.sectionHeader}>
                     <div>
+                      <p className={styles.sectionEyebrow}>Guardado manual</p>
+                      <h3>Control de cambios</h3>
+                      <p>
+                        Edita libremente y decide cuando persistir el borrador
+                        actual en la base de datos.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className={styles.manualSaveActions}>
+                    <button
+                      type="button"
+                      className={formStyles.button}
+                      onClick={handleSaveChanges}
+                      disabled={
+                        isSiteConfigLoading ||
+                        saveStatus === 'saving' ||
+                        !hasUnsavedChanges
+                      }
+                    >
+                      Guardar cambios
+                    </button>
+                    <button
+                      type="button"
+                      className={formStyles.secondaryButton}
+                      onClick={discardChanges}
+                      disabled={
+                        isSiteConfigLoading ||
+                        saveStatus === 'saving' ||
+                        !hasUnsavedChanges
+                      }
+                    >
+                      Descartar cambios
+                    </button>
+                  </div>
+
+                  <div className={styles.manualSaveMeta}>
+                    <span className={styles.statusBadge}>{getSyncLabel()}</span>
+                    {hasUnsavedChanges ? (
+                      <small>
+                        Tienes un borrador local. Nada se guarda hasta pulsar
+                        "Guardar cambios".
+                      </small>
+                    ) : (
+                      <small>
+                        {lastSavedAt
+                          ? `Ultimo guardado: ${formatDateTime(lastSavedAt)}`
+                          : 'No hay cambios pendientes por guardar.'}
+                      </small>
+                    )}
+                    {saveError ? <small>{saveError}</small> : null}
+                    {!saveError && loadError ? <small>{loadError}</small> : null}
+                  </div>
+                </section>
+
+                <section className={`${styles.sectionCard} ${styles.sidebarCard}`}>
+                  <div className={styles.sectionHeader}>
+                    <div>
                       <p className={styles.sectionEyebrow}>Controles</p>
                       <h3>Acciones del entorno</h3>
+                      <p>
+                        Estas acciones modifican el borrador actual o la sesion
+                        del administrador.
+                      </p>
                     </div>
                   </div>
 
@@ -409,7 +494,7 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
                       className={formStyles.dangerButton}
                       onClick={logout}
                     >
-                      Cerrar sesion admin
+                      Cerrar sesion de administrador
                     </button>
                   </div>
                 </section>
@@ -440,8 +525,14 @@ function AdminPanel({ isOpen, onClose, activePageId }) {
                     </div>
                     <div className={styles.syncMeta}>
                       <span className={styles.statusBadge}>{getSyncLabel()}</span>
-                      {lastSavedAt ? (
-                        <small>Ultima sincronizacion: {formatDateTime(lastSavedAt)}</small>
+                      {lastSavedAt && !hasUnsavedChanges ? (
+                        <small>Ultimo guardado: {formatDateTime(lastSavedAt)}</small>
+                      ) : null}
+                      {hasUnsavedChanges ? (
+                        <small>
+                          Este contenido tiene cambios locales. Guarda o descarta
+                          antes de salir del panel.
+                        </small>
                       ) : null}
                       {saveError ? <small>{saveError}</small> : null}
                       {!saveError && loadError ? <small>{loadError}</small> : null}

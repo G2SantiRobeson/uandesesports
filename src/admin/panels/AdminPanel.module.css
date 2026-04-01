@@ -24,15 +24,20 @@
 }
 
 .panelHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1.5rem;
+  display: grid;
+  gap: 1rem;
   padding: 1.45rem 1.6rem 1.2rem;
   border-bottom: 1px solid var(--line-soft);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent),
     rgba(16, 23, 33, 0.82);
+}
+
+.panelHeaderMain {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
 }
 
 .panelHeaderCopy {
@@ -66,13 +71,19 @@
 
 .headerActions {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.headerBadges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.75rem;
 }
 
 .userBadge,
-.statusBadge,
-.closeButton {
+.statusBadge {
   min-height: 2.75rem;
   padding: 0.78rem 1rem;
   border-radius: 999px;
@@ -87,6 +98,19 @@
 }
 
 .closeButton {
+  width: 2.9rem;
+  min-width: 2.9rem;
+  min-height: 2.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(211, 96, 96, 0.28);
+  background: rgba(211, 96, 96, 0.12);
+  color: #ffc4c4;
+  font-size: 1.35rem;
+  line-height: 1;
   cursor: pointer;
   transition:
     background var(--transition),
@@ -97,21 +121,47 @@
 
 .closeButton:hover,
 .closeButton:focus-visible {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(211, 96, 96, 0.18);
+  border-color: rgba(211, 96, 96, 0.42);
   transform: translateY(-1px);
 }
 
 .closeButtonDanger {
-  border-color: rgba(211, 167, 167, 0.22);
-  background: rgba(211, 167, 167, 0.08);
-  color: var(--danger);
+  box-shadow: 0 10px 26px rgba(211, 96, 96, 0.18);
 }
 
 .closeButtonDanger:hover,
 .closeButtonDanger:focus-visible {
-  background: rgba(211, 167, 167, 0.14);
-  border-color: rgba(211, 167, 167, 0.3);
+  box-shadow: 0 14px 30px rgba(211, 96, 96, 0.22);
+}
+
+.headerHintBar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding-top: 0.15rem;
+}
+
+.headerHintTag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.7rem;
+  padding: 0.24rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(211, 96, 96, 0.22);
+  background: rgba(211, 96, 96, 0.08);
+  color: #ffc4c4;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.headerHintCopy {
+  margin: 0;
+  color: var(--soft);
+  font-size: 0.88rem;
+  line-height: 1.6;
 }
 
 .panelBody {
@@ -302,6 +352,21 @@
   gap: 0.75rem;
 }
 
+.manualSaveActions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.manualSaveMeta {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.manualSaveMeta small {
+  color: var(--soft);
+  line-height: 1.55;
+}
+
 .controlStack > * {
   width: 100%;
 }
@@ -371,13 +436,23 @@
 }
 
 @media (max-width: 900px) {
+  .panelBody {
+    overflow: auto;
+  }
+
   .workspace {
+    height: auto;
     grid-template-columns: 1fr;
   }
 
   .sidebar {
+    overflow: visible;
     border-right: 0;
     border-bottom: 1px solid var(--line-soft);
+  }
+
+  .editor {
+    overflow: visible;
   }
 
   .accountMeta {
@@ -397,15 +472,34 @@
     padding: 1.2rem 1rem 1rem;
   }
 
+  .panelHeaderMain {
+    flex-direction: column;
+  }
+
   .panelHeader h2 {
     font-size: 1.8rem;
   }
 
-  .headerActions,
   .sectionHeader,
   .primaryActions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .headerBadges {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .headerHintBar {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .sidebar,

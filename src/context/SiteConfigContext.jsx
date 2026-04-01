@@ -2,7 +2,6 @@ import {
   createContext,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import { useAuth } from './AuthContext';
@@ -14,6 +13,7 @@ import {
 } from '../services/siteConfigService';
 import {
   canMoveOrderedItem,
+  cloneData,
   createDefaultBlock,
   createDefaultPage,
   createDefaultTournamentGroup,
@@ -58,14 +58,15 @@ function updateTournamentPageCollection(pages, pageId, callback) {
 export function SiteConfigProvider({ children }) {
   const { isAdmin } = useAuth();
   const [siteConfig, setSiteConfig] = useState(() => getDefaultSiteConfig());
+  const [persistedSiteConfig, setPersistedSiteConfig] = useState(() =>
+    getDefaultSiteConfig(),
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [saveStatus, setSaveStatus] = useState('idle');
   const [saveError, setSaveError] = useState('');
   const [lastSavedAt, setLastSavedAt] = useState('');
-  const hasHydratedRef = useRef(false);
-  const isDirtyRef = useRef(false);
-  const saveTimeoutRef = useRef(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -82,7 +83,11 @@ export function SiteConfigProvider({ children }) {
         }
 
         setSiteConfig(nextSiteConfig);
+        setPersistedSiteConfig(cloneData(nextSiteConfig));
         setLastSavedAt(new Date().toISOString());
+        setSaveStatus('saved');
+        setSaveError('');
+        setHasUnsavedChanges(false);
       } catch (error) {
         console.error('No fue posible cargar siteConfig desde la API.', error);
 
@@ -90,11 +95,16 @@ export function SiteConfigProvider({ children }) {
           return;
         }
 
+        const fallbackSiteConfig = getDefaultSiteConfig();
         setLoadError(error.message);
-        setSiteConfig(getDefaultSiteConfig());
+        setSiteConfig(fallbackSiteConfig);
+        setPersistedSiteConfig(cloneData(fallbackSiteConfig));
+        setSaveStatus('idle');
+        setSaveError('');
+        setHasUnsavedChanges(false);
+        setLastSavedAt('');
       } finally {
         if (isMounted) {
-          hasHydratedRef.current = true;
           setIsLoading(false);
         }
       }
@@ -107,50 +117,56 @@ export function SiteConfigProvider({ children }) {
     };
   }, []);
 
-  useEffect(() => {
-    if (!hasHydratedRef.current || !isDirtyRef.current || !isAdmin) {
-      return undefined;
-    }
-
-    setSaveStatus('saving');
-    window.clearTimeout(saveTimeoutRef.current);
-
-    saveTimeoutRef.current = window.setTimeout(async () => {
-      try {
-        const persistedSiteConfig = await saveSiteConfig(siteConfig);
-        isDirtyRef.current = false;
-        setSiteConfig(persistedSiteConfig);
-        setSaveStatus('saved');
-        setSaveError('');
-        setLastSavedAt(new Date().toISOString());
-      } catch (error) {
-        console.error('No fue posible guardar siteConfig en la API.', error);
-        setSaveStatus('error');
-        setSaveError(error.message);
-      }
-    }, 550);
-
-    return () => {
-      window.clearTimeout(saveTimeoutRef.current);
-    };
-  }, [isAdmin, siteConfig]);
-
-  useEffect(
-    () => () => {
-      window.clearTimeout(saveTimeoutRef.current);
-    },
-    [],
-  );
-
   function applyConfigUpdate(updater) {
     setSaveError('');
 
     if (isAdmin) {
-      isDirtyRef.current = true;
       setSaveStatus('pending');
+      setHasUnsavedChanges(true);
     }
 
     setSiteConfig((currentConfig) => normalizeSiteConfig(updater(currentConfig)));
+  }
+
+  async function saveChanges() {
+    if (!isAdmin) {
+      return siteConfig;
+    }
+
+    if (!hasUnsavedChanges) {
+      setSaveStatus(lastSavedAt ? 'saved' : 'idle');
+      return siteConfig;
+    }
+
+    setSaveStatus('saving');
+    setSaveError('');
+
+    try {
+      const nextPersistedSiteConfig = await saveSiteConfig(siteConfig);
+      setSiteConfig(nextPersistedSiteConfig);
+      setPersistedSiteConfig(cloneData(nextPersistedSiteConfig));
+      setHasUnsavedChanges(false);
+      setSaveStatus('saved');
+      setLoadError('');
+      setLastSavedAt(new Date().toISOString());
+      return nextPersistedSiteConfig;
+    } catch (error) {
+      console.error('No fue posible guardar siteConfig en la API.', error);
+      setSaveStatus('error');
+      setSaveError(error.message);
+      throw error;
+    }
+  }
+
+  function discardChanges() {
+    if (!isAdmin || !hasUnsavedChanges) {
+      return;
+    }
+
+    setSiteConfig(normalizeSiteConfig(cloneData(persistedSiteConfig)));
+    setSaveError('');
+    setHasUnsavedChanges(false);
+    setSaveStatus(lastSavedAt ? 'saved' : 'idle');
   }
 
   function createPage(label) {
@@ -755,6 +771,7 @@ export function SiteConfigProvider({ children }) {
         saveStatus,
         saveError,
         lastSavedAt,
+        hasUnsavedChanges,
         createPage,
         createTournamentPage,
         updatePage,
@@ -786,6 +803,8 @@ export function SiteConfigProvider({ children }) {
         updateBrand,
         updateFooter,
         replaceFooterLinks,
+        saveChanges,
+        discardChanges,
         restoreDefaults,
       }}
     >
